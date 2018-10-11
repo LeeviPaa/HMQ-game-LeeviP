@@ -1,18 +1,21 @@
 // Tutorial from https://www.sfml-dev.org/tutorials/2.4/start-vc.php
 
 #include <SFML/Graphics.hpp>
+#include "Main.h"
+#include "Actor.h"
+#include "Player.h"
 #include <iostream>
 
-void Update(sf::Time deltaTime);
-void Draw(sf::RenderWindow* window);
+Player PlayerOne;
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(800, 800), "SFML works!");
 	sf::Clock clock;
 
-
-
+	// Font
+	if (!font.loadFromFile("sansation.ttf"))
+		return EXIT_FAILURE;
 
 	while (window.isOpen())
 	{
@@ -35,6 +38,7 @@ int main()
 void Update(sf::Time deltaTime)
 {
 	std::cout << deltaTime.asMicroseconds() << std::endl;
+	PlayerOne.Update(deltaTime);
 }
 
 void Draw(sf::RenderWindow* window)
@@ -42,8 +46,13 @@ void Draw(sf::RenderWindow* window)
 	sf::CircleShape shape(100.f);
 	shape.setFillColor(sf::Color::Green);
 
+	sf::Text text("Score: "+ PlayerScore, font, 50);
+
 	window->clear();
-	window->draw(shape);
+
+	window->draw(text);
+	window->draw(PlayerOne);
+
 	window->display();
 }
 
