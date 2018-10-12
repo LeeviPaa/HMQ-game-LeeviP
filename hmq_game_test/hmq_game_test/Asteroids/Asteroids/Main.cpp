@@ -19,6 +19,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(800, 800), "Asteroids by Leevi P.");
 	sf::Clock clock;
 
+	float maxFps = 200;
 	Game GameLoop;
 
 	// Font
@@ -41,6 +42,7 @@ int main()
 		GameLoop.Update(deltaTime);
 		GameLoop.Draw(&window);
 		GameLoop.DeleteObjects();
+		sf::sleep(sf::seconds((1 / maxFps)));
 	}
 
 	return 0;
