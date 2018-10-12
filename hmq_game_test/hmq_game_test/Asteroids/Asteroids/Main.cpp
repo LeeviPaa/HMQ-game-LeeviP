@@ -4,6 +4,7 @@
 #include "Actor.h"
 #include "Player.h"
 #include "Game.h"
+#include <iostream>
 
 #define DEBUG 1
 
@@ -24,6 +25,7 @@ int main()
 	if (!GameLoop.font.loadFromFile("sansation.ttf"))
 		return EXIT_FAILURE;
 
+	int frame = 0;
 
 	while (window.isOpen())
 	{
@@ -38,6 +40,7 @@ int main()
 		
 		GameLoop.Update(deltaTime);
 		GameLoop.Draw(&window);
+		GameLoop.DeleteObjects();
 	}
 
 	return 0;

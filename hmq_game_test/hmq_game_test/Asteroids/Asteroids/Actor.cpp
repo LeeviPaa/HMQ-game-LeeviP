@@ -14,15 +14,6 @@ int Actor::VectorLenght(sf::Vector2i Vector)
 	return lenght;
 }
 
-Actor::Actor()
-{
-}
-
-
-Actor::~Actor()
-{
-}
-
 void Actor::Update(Time deltaTime)
 {
 

@@ -1,3 +1,5 @@
-﻿  Player.cpp
-g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\player.cpp(55): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+﻿  Game.cpp
+  Player.cpp
+g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\player.cpp(86): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  Generating Code...
   Asteroids.vcxproj -> G:\Projects\CPP\HMQ game LeeviP\hmq_game_test\hmq_game_test\Asteroids\x64\Debug\Asteroids.exe

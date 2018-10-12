@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\sfml-2.4.2\include\sfml\system\</FILEPATH>
+      <FILENAME>noncopyable.hpp</FILENAME>
+      <LINE>53</LINE>
+      <COLUMN>4</COLUMN>
+    </SFA>
+    <DEFECTCODE>26439</DEFECTCODE>
+    <DESCRIPTION>This kind of function may not throw. Declare it 'noexcept' (f.6).</DESCRIPTION>
+    <FUNCTION>sf::NonCopyable::{ctor}</FUNCTION>
+    <DECORATED>??0NonCopyable@sf@@IEAA@XZ</DECORATED>
+    <FUNCLINE>53</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\sfml-2.4.2\include\sfml\window\</FILEPATH>
+      <FILENAME>contextsettings.hpp</FILENAME>
+      <LINE>61</LINE>
+      <COLUMN>4</COLUMN>
+    </SFA>
+    <DEFECTCODE>26439</DEFECTCODE>
+    <DESCRIPTION>This kind of function may not throw. Declare it 'noexcept' (f.6).</DESCRIPTION>
+    <FUNCTION>sf::ContextSettings::{ctor}</FUNCTION>
+    <DECORATED>??0ContextSettings@sf@@QEAA@IIIIII_N@Z</DECORATED>
+    <FUNCLINE>61</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\sfml-2.4.2\include\sfml\graphics\</FILEPATH>
+      <FILENAME>glyph.hpp</FILENAME>
+      <LINE>49</LINE>
+      <COLUMN>4</COLUMN>
+    </SFA>
+    <DEFECTCODE>26439</DEFECTCODE>
+    <DESCRIPTION>This kind of function may not throw. Declare it 'noexcept' (f.6).</DESCRIPTION>
+    <FUNCTION>sf::Glyph::{ctor}</FUNCTION>
+    <DECORATED>??0Glyph@sf@@QEAA@XZ</DECORATED>
+    <FUNCLINE>49</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\</FILEPATH>
+      <FILENAME>game.cpp</FILENAME>
+      <LINE>21</LINE>
+      <COLUMN>103</COLUMN>
+    </SFA>
+    <DEFECTCODE>26444</DEFECTCODE>
+    <DESCRIPTION>Avoid unnamed objects with custom construction and destruction (es.84).</DESCRIPTION>
+    <FUNCTION>Game::Update</FUNCTION>
+    <DECORATED>?Update@Game@@QEAAXVTime@sf@@@Z</DECORATED>
+    <FUNCLINE>12</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\</FILEPATH>
+      <FILENAME>game.cpp</FILENAME>
+      <LINE>46</LINE>
+      <COLUMN>97</COLUMN>
+    </SFA>
+    <DEFECTCODE>26444</DEFECTCODE>
+    <DESCRIPTION>Avoid unnamed objects with custom construction and destruction (es.84).</DESCRIPTION>
+    <FUNCTION>Game::Draw</FUNCTION>
+    <DECORATED>?Draw@Game@@QEAAXPEAVRenderWindow@sf@@@Z</DECORATED>
+    <FUNCLINE>28</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\sfml-2.4.2\include\sfml\system\</FILEPATH>
+      <FILENAME>vector2.inl</FILENAME>
+      <LINE>28</LINE>
+      <COLUMN>19</COLUMN>
+    </SFA>
+    <DEFECTCODE>26439</DEFECTCODE>
+    <DESCRIPTION>This kind of function may not throw. Declare it 'noexcept' (f.6).</DESCRIPTION>
+    <FUNCTION>sf::Vector2&lt;float&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$Vector2@M@sf@@QEAA@XZ</DECORATED>
+    <FUNCLINE>28</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\sfml-2.4.2\include\sfml\graphics\</FILEPATH>
+      <FILENAME>rect.inl</FILENAME>
+      <LINE>28</LINE>
+      <COLUMN>9</COLUMN>
+    </SFA>
+    <DEFECTCODE>26439</DEFECTCODE>
+    <DESCRIPTION>This kind of function may not throw. Declare it 'noexcept' (f.6).</DESCRIPTION>
+    <FUNCTION>sf::Rect&lt;int&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$Rect@H@sf@@QEAA@XZ</DECORATED>
+    <FUNCLINE>28</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\sfml-2.4.2\include\sfml\graphics\</FILEPATH>
+      <FILENAME>rect.inl</FILENAME>
+      <LINE>28</LINE>
+      <COLUMN>9</COLUMN>
+    </SFA>
+    <DEFECTCODE>26439</DEFECTCODE>
+    <DESCRIPTION>This kind of function may not throw. Declare it 'noexcept' (f.6).</DESCRIPTION>
+    <FUNCTION>sf::Rect&lt;float&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$Rect@M@sf@@QEAA@XZ</DECORATED>
+    <FUNCLINE>28</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+</DEFECTS>

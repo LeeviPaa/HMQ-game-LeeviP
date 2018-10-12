@@ -19,8 +19,6 @@ protected:
 
 
 public:
-	Actor();
-	~Actor();
 
 	virtual void Update(Time deltaTime);
 

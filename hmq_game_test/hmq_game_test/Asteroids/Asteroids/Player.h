@@ -4,9 +4,12 @@ class Player :
 	public Actor
 {
 private:
-	float MoveSpeed = 130.f;
+	float MoveSpeed = 100.f;
+	float Acceleration = 10.f;
 	float Deceleration = 0.999f;
+	bool gate = false;
 	Vector2<float> CurrentVelocity;
+	sf::RectangleShape shape;
 
 	void Decelerate();
 
@@ -16,15 +19,6 @@ public:
 	void draw(RenderTarget& target, RenderStates states) const
 	{
 		states.transform *= getTransform();
-
-		sf::Vector2<float> boxSize;
-		boxSize.x = 25;
-		boxSize.y = 25;
-
-		//no need to do this every frame!!!
-		//create a start() function
-		sf::RectangleShape shape(boxSize);
-		shape.setFillColor(sf::Color::Yellow);
 
 		target.draw(shape, states);
 	}

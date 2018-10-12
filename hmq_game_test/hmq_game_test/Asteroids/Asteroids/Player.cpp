@@ -14,6 +14,13 @@ Player::Player()
 {
 	setOrigin(25.f/2, 25.f/2);
 	setPosition(400, 400);
+
+	sf::Vector2<float> boxSize;
+	boxSize.x = 25;
+	boxSize.y = 25;
+
+	shape.setSize(boxSize);
+	shape.setFillColor(sf::Color::Yellow);
 }
 
 void Player::Update(sf::Time deltaTime)
@@ -22,28 +29,52 @@ void Player::Update(sf::Time deltaTime)
 	Decelerate();
 
 	//Player movement
+	sf::Vector2f InputVector;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		CurrentVelocity.x = -1;
+		InputVector.x = -1;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		CurrentVelocity.x = 1;
+		InputVector.x = 1;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		CurrentVelocity.y = -1;
+		InputVector.y = -1;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		CurrentVelocity.y = 1;
+		InputVector.y = 1;
 	}
+
+	if (!gate && sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+	{
+		gate = true;
+		Asteroid* testActor = Game::SpawnAsteroid();
+		testActor->setPosition(50, 200);
+	}
+
+	CurrentVelocity += InputVector * Acceleration*deltaTime.asSeconds();
+
+	if (CurrentVelocity.x > MoveSpeed)
+		CurrentVelocity.x = MoveSpeed;
+
+	if (CurrentVelocity.x < -MoveSpeed)
+		CurrentVelocity.x = -MoveSpeed;
+
+	if (CurrentVelocity.y > MoveSpeed)
+		CurrentVelocity.y = MoveSpeed;
+
+	if (CurrentVelocity.y < -MoveSpeed)
+		CurrentVelocity.y = -MoveSpeed;
+	
+	move(CurrentVelocity*deltaTime.asSeconds() * MoveSpeed);
 
 	//player rotation
 	sf::Vector2<float> normalVector;
@@ -73,7 +104,6 @@ void Player::Update(sf::Time deltaTime)
 		setRotation(angle);
 	}
 
-	move(CurrentVelocity*deltaTime.asSeconds() * MoveSpeed);
 
 	//move the player from one edge to another smoothly
 	Vector2f NewPos = getPosition();
