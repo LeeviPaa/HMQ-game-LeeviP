@@ -2,6 +2,7 @@
 #include <iostream>
 #include "Actor.h"
 #include <string>
+#include <random>
 
 #define LOG(x) std::cout << x << std::endl
 
@@ -36,6 +37,8 @@ void Game::Update(sf::Time deltaTime)
 		PlayerBullet* pbullet = &*updateIteratorB;
 		pbullet->Update(deltaTime);
 	}
+
+	AsteroidSpawner(deltaTime.asSeconds());
 }
 
 void Game::Draw(sf::RenderWindow* window)
@@ -76,6 +79,87 @@ void Game::Draw(sf::RenderWindow* window)
 //This is the main spawn function (static)
 //this ensures that the spawned objects are drawn and updated
 //this enables checking for collisions
+
+void Game::AsteroidSpawner(float deltaTime)
+{
+	AsteroidTimeElapsed += deltaTime;
+
+	if (AsteroidTimeElapsed >= AsteroidSpawnTime)
+	{
+		AsteroidTimeElapsed = 0;
+		
+		//select a direction to move
+		float direction = (rand() % 2);
+		
+		Vector2f directionV(0, 0);
+		Vector2f position(0,0);
+
+		if (direction == 0)
+		{
+			directionV = Vector2f(-1, -1);
+			//select a spawn point on the direction side
+
+			int randX = (rand() % 6);
+			switch (randX)
+			{
+			case 0:
+				position = Vector2f(100, 900);
+				break;
+			case 1:
+				position = Vector2f(400, 900);
+				break;
+			case 2:
+				position = Vector2f(700, 900);
+				break;
+			case 3:
+				position = Vector2f(900, 200);
+				break;
+			case 4:
+				position = Vector2f(900, 500);
+				break;
+			case 5:
+				position = Vector2f(900, 800);
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			directionV = Vector2f(1, 1);
+
+			//select a spawn point on the direction side
+
+			int randX = (rand() % 6);
+			switch (randX)
+			{
+			case 0:
+				position = Vector2f(-100, 100);
+				break;
+			case 1:
+				position = Vector2f(-100, 400);
+				break;
+			case 2:
+				position = Vector2f(-100, 700);
+				break;
+			case 3:
+				position = Vector2f(200, -100);
+				break;
+			case 4:
+				position = Vector2f(500, -100);
+				break;
+			case 5:
+				position = Vector2f(800, -100);
+				break;
+			default:
+				break;
+			}
+		}
+
+		Asteroid* astero = SpawnAsteroid(directionV);
+		astero->setPosition(position);
+	}
+}
 
 Player * Game::SpawnPlayer()
 {
@@ -125,11 +209,11 @@ void Game::DeleteObjects()
 	}
 }
 
-Asteroid* Game::SpawnAsteroid()
+Asteroid* Game::SpawnAsteroid(Vector2f direction)
 {
 	//asteroid is spawned on the scope of this function
 	//this gets destroyed at the end of this function
-	Asteroid Object;
+	Asteroid Object(direction);
 	//a copy is placed in the list
 	Game::AsteroidsInGame.push_front(Object);
 	std::list<Asteroid>::iterator it = AsteroidsInGame.begin();

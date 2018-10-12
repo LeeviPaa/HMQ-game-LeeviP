@@ -34,7 +34,7 @@ void Player::Movement(float deltaTime)
 	if (!gate && sf::Keyboard::isKeyPressed(sf::Keyboard::K))
 	{
 		gate = true;
-		Asteroid* testActor = Game::SpawnAsteroid();
+		Asteroid* testActor = Game::SpawnAsteroid(Vector2f(1,1));
 		testActor->setPosition(50, 200);
 	}
 
@@ -153,9 +153,7 @@ Player::Player()
 	playerShape[2].color = sf::Color::White;
 	playerShape[3].color = sf::Color::White;
 
-
-	shape.setSize(boxSize);
-	shape.setFillColor(sf::Color::Yellow);
+	boundingBox = playerShape.getBounds();
 }
 
 void Player::Update(sf::Time deltaTime)

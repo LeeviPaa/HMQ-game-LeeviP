@@ -22,6 +22,7 @@ private:
 public:
 	Player();
 	VertexArray playerShape;
+	FloatRect boundingBox;
 	void Update(sf::Time deltaTime) override;
 	void draw(RenderTarget& target, RenderStates states) const
 	{

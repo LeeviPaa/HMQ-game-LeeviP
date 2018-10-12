@@ -14,7 +14,7 @@ PlayerBullet::PlayerBullet(Vector2f direction)
 {
 	Direction = direction;
 	Shape = CircleShape(2.0f);
-	Shape.setFillColor(sf::Color::Blue);
+	Shape.setFillColor(sf::Color::White);
 }
 
 PlayerBullet::~PlayerBullet()

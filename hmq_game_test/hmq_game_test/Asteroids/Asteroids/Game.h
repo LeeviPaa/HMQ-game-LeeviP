@@ -11,6 +11,9 @@ private:
 	Player PlayerOne;
 	int PlayerScore = 0;
 
+	float AsteroidSpawnTime = 1;
+	float AsteroidTimeElapsed = 0;
+
 	//static lists of objects should not leak on the closing of the program
 	static std::list<Asteroid> AsteroidsInGame;
 	static std::list<Asteroid*> ToBeDeletedAsteroids;
@@ -20,6 +23,8 @@ private:
 	static std::list<PlayerBullet> PBulletsInGame;
 	static std::list<PlayerBullet*> ToBeDeletedPBullets;
 
+	void AsteroidSpawner(float deltaTime);
+
 
 public:
 
@@ -27,7 +32,7 @@ public:
 	void Draw(sf::RenderWindow* window);
 	void DeleteObjects();
 
-	static Asteroid* SpawnAsteroid();
+	static Asteroid* SpawnAsteroid(Vector2f direction);
 	static bool DeleteAsteroid(Asteroid* deletable);
 	bool AsteroidIsInList(Asteroid* astero);
 
