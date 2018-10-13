@@ -1,6 +1,7 @@
 #include "Actor.h"
+#include <iostream>
 
-
+#define LOG(x) std::cout << x << std::endl
 
 float Actor::VectorLenght(sf::Vector2f Vector)
 {

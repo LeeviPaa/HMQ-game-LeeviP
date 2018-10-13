@@ -8,14 +8,21 @@ private:
 	Vector2f Direction;
 	float TimeElapsed = 0;
 	bool dead = false;
-	sf::VertexArray AsteroidShape;
-	float rotSpeed = 0;
 	void Die();
+	VertexArray AsteroidShape;
 
 public:
-	Asteroid(Vector2f direction);
+	enum AsteroidType {
+		big,
+		medium,
+		small
+	};
+
+	Asteroid(Vector2f direction, AsteroidType type);
 	~Asteroid();
+	AsteroidType asteroType;
 	FloatRect boundingBox;
+	void Collide();
 
 	void Update(sf::Time deltaTime) override;
 	void draw(RenderTarget& target, RenderStates states) const

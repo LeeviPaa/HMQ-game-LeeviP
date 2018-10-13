@@ -21,6 +21,7 @@ protected:
 public:
 
 	virtual void Update(Time deltaTime);
+	ConvexShape collision;
 
 	virtual void draw(RenderTarget& target, RenderStates states) const
 	{

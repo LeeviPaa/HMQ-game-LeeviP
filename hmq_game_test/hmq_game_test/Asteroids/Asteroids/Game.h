@@ -31,16 +31,15 @@ public:
 	void Update(sf::Time deltaTime);
 	void Draw(sf::RenderWindow* window);
 	void DeleteObjects();
+	void CheckCollisions();
 
-	static Asteroid* SpawnAsteroid(Vector2f direction);
+	static Asteroid* SpawnAsteroid(Vector2f direction, Asteroid::AsteroidType type);
 	static bool DeleteAsteroid(Asteroid* deletable);
 	bool AsteroidIsInList(Asteroid* astero);
 
 	static PlayerBullet* SpawnPBullet(Vector2f direction);
 	static bool DeletePBullet(PlayerBullet* deletable);
 	bool PBulletIsInList(PlayerBullet* bullet);
-
-	static Player* SpawnPlayer();
 
 	sf::Font font;
 	static sf::Vector2<int> LocalMousePosition;

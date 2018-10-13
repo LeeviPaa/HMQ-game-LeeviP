@@ -31,13 +31,6 @@ void Player::Movement(float deltaTime)
 		InputVector.y = 1;
 	}
 
-	if (!gate && sf::Keyboard::isKeyPressed(sf::Keyboard::K))
-	{
-		gate = true;
-		Asteroid* testActor = Game::SpawnAsteroid(Vector2f(1,1));
-		testActor->setPosition(50, 200);
-	}
-
 	CurrentVelocity += InputVector * Acceleration*deltaTime;
 
 	if (CurrentVelocity.x > MoveSpeed)

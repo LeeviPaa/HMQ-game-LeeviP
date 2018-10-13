@@ -9,17 +9,60 @@ void Asteroid::Die()
 {
 	dead = true;
 	Game::DeleteAsteroid(this);
+
+	Vector2f direction(0, 0);
+	float dirX = ((rand() % 200) - 100.f)/100.f;
+	float dirY = ((rand() % 200) - 100.f)/100.f;
+	LOG(direction.x);
+	direction.x = dirX;
+	direction.y = dirY;
+
+	Asteroid* subA;
+	Asteroid* subB;
+
+	//here we spawn two smaller asteroids depending on this type
+	switch (asteroType)
+	{
+	case Asteroid::big:
+		subA = Game::SpawnAsteroid(direction, AsteroidType::medium);
+		subA->setPosition(getPosition() + direction*55.f);
+		subB = Game::SpawnAsteroid(-direction, AsteroidType::medium);
+		subB->setPosition(getPosition() - direction * 55.f);
+		break;
+	case Asteroid::medium:
+		subA = Game::SpawnAsteroid(direction, AsteroidType::small);
+		subA->setPosition(getPosition() + direction * 30.f);
+		subB = Game::SpawnAsteroid(-direction, AsteroidType::small);
+		subB->setPosition(getPosition() - direction * 30.f);
+		break;
+	case Asteroid::small:
+		break;
+	default:
+		break;
+	}
 }
 
-Asteroid::Asteroid(Vector2f direction)
+Asteroid::Asteroid(Vector2f direction, AsteroidType type)
 {
 	Direction = direction;
-	setOrigin(50, 50);
-
-	setRotation(rand() % 360);
-	rotSpeed = (rand() % 300) -150;
 		
 	AsteroidShape = VertexArray(sf::LineStrip, 8);
+
+	asteroType = type;
+
+	switch (type)
+	{
+	case Asteroid::big:
+		break;
+	case Asteroid::medium:
+		setScale(0.5f, 0.5f);
+		break;
+	case Asteroid::small:
+		setScale(0.25f, 0.25f);
+		break;
+	default:
+		break;
+	}
 
 	int shape = rand() % 2;
 	if (shape == 0)
@@ -33,6 +76,15 @@ Asteroid::Asteroid(Vector2f direction)
 		AsteroidShape[5].position = Vector2f(60, 110);
 		AsteroidShape[6].position = Vector2f(0, 50);
 		AsteroidShape[7].position = Vector2f(0, 0);
+
+		//create a convex shape from which we can get the globalbounds
+		collision = ConvexShape(5);
+
+		collision.setPoint(0, Vector2f(0, 0));
+		collision.setPoint(1, Vector2f(100, 0));
+		collision.setPoint(2, Vector2f(100, 100));
+		collision.setPoint(3, Vector2f(60, 110));
+		collision.setPoint(4, Vector2f(0, 50));
 	}
 	else
 	{
@@ -44,6 +96,15 @@ Asteroid::Asteroid(Vector2f direction)
 		AsteroidShape[5].position = Vector2f(30, 50);
 		AsteroidShape[6].position = Vector2f(0, 40);
 		AsteroidShape[7].position = Vector2f(0, 0);
+
+		collision = ConvexShape(6);
+
+		collision.setPoint(0, Vector2f(0, 0));
+		collision.setPoint(1, Vector2f(50, -30));
+		collision.setPoint(2, Vector2f(100, 60));
+		collision.setPoint(3, Vector2f(85, 90));
+		collision.setPoint(4, Vector2f(75, 100));
+		collision.setPoint(5, Vector2f(0, 40));
 	}
 
 	AsteroidShape[0].color = sf::Color::White;
@@ -55,7 +116,8 @@ Asteroid::Asteroid(Vector2f direction)
 	AsteroidShape[6].color = sf::Color::White;
 	AsteroidShape[7].color = sf::Color::White;
 
-	boundingBox = AsteroidShape.getBounds();
+	collision.setScale(getScale());
+	boundingBox = collision.getGlobalBounds();
 }
 
 Asteroid::~Asteroid()
@@ -63,13 +125,23 @@ Asteroid::~Asteroid()
 	//LOG("DESTROYED");
 }
 
+void Asteroid::Collide()
+{
+	LOG("Collision");
+	Die();
+}
 
 void Asteroid::Update(sf::Time deltaTime)
 {
 	if (dead)
 		return;
 	move(Direction*deltaTime.asSeconds()*MoveSpeed);
-	rotate(rotSpeed * deltaTime.asSeconds());
+
+	boundingBox = collision.getGlobalBounds();
+
+	collision.setPosition(getPosition());
+
+	Vector2f point = collision.getPoint(0);
 
 	Vector2f position = getPosition();
 

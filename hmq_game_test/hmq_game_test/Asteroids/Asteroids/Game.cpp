@@ -37,7 +37,6 @@ void Game::Update(sf::Time deltaTime)
 		PlayerBullet* pbullet = &*updateIteratorB;
 		pbullet->Update(deltaTime);
 	}
-
 	AsteroidSpawner(deltaTime.asSeconds());
 }
 
@@ -76,9 +75,44 @@ void Game::Draw(sf::RenderWindow* window)
 	window->display();
 }
 
-//This is the main spawn function (static)
-//this ensures that the spawned objects are drawn and updated
-//this enables checking for collisions
+void Game::CheckCollisions()
+{
+	std::list<Asteroid>::iterator updateIterator;
+	for (updateIterator = AsteroidsInGame.begin(); updateIterator != AsteroidsInGame.end(); updateIterator++)
+	{
+		Asteroid* asteroid = &*updateIterator;
+		sf::FloatRect bounds = asteroid->boundingBox;
+
+		std::list<PlayerBullet>::iterator iter;
+		for (iter = PBulletsInGame.begin(); iter != PBulletsInGame.end(); iter++)
+		{
+			//If the bullet collides with an asteroid: do something
+			PlayerBullet* bullet = &*iter;
+			if (bounds.contains(bullet->getPosition()))
+			{
+				asteroid->Collide();
+				bullet->Collide();
+
+				//add points depending on the size
+				switch (asteroid->asteroType)
+				{
+				case Asteroid::big:
+					PlayerScore += 100;
+					break;
+				case Asteroid::medium:
+					PlayerScore += 50;
+					break;
+				case Asteroid::small:
+					PlayerScore += 25;
+					break;
+				default:
+					break;
+				}
+				
+			}
+		}
+	}
+}
 
 void Game::AsteroidSpawner(float deltaTime)
 {
@@ -156,14 +190,9 @@ void Game::AsteroidSpawner(float deltaTime)
 			}
 		}
 
-		Asteroid* astero = SpawnAsteroid(directionV);
+		Asteroid* astero = SpawnAsteroid(directionV, Asteroid::AsteroidType::big);
 		astero->setPosition(position);
 	}
-}
-
-Player * Game::SpawnPlayer()
-{
-	return nullptr;
 }
 
 void Game::DeleteObjects()
@@ -209,11 +238,15 @@ void Game::DeleteObjects()
 	}
 }
 
-Asteroid* Game::SpawnAsteroid(Vector2f direction)
+
+//These are the main spawn functions (static)
+//these ensure that the spawned objects are drawn and updated
+//these enable checking for collisions
+Asteroid* Game::SpawnAsteroid(Vector2f direction, Asteroid::AsteroidType type)
 {
 	//asteroid is spawned on the scope of this function
 	//this gets destroyed at the end of this function
-	Asteroid Object(direction);
+	Asteroid Object(direction, type);
 	//a copy is placed in the list
 	Game::AsteroidsInGame.push_front(Object);
 	std::list<Asteroid>::iterator it = AsteroidsInGame.begin();

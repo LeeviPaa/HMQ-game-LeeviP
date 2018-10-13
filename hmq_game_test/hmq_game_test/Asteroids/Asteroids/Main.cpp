@@ -40,6 +40,7 @@ int main()
 		}
 		
 		GameLoop.Update(deltaTime);
+		GameLoop.CheckCollisions();
 		GameLoop.Draw(&window);
 		GameLoop.DeleteObjects();
 		sf::sleep(sf::seconds((1 / maxFps)));
