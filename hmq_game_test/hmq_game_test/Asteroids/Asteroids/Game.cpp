@@ -291,7 +291,8 @@ void Game::AsteroidSpawner(float deltaTime)
 {
 	AsteroidTimeElapsed += deltaTime;
 
-	if (AsteroidTimeElapsed >= AsteroidSpawnTime)
+	//asteroid spawn time decreases when difficulty rises
+	if (AsteroidTimeElapsed >= AsteroidSpawnTime*(pow(0.9f, currentLevel)))
 	{
 		AsteroidTimeElapsed = 0;
 		
@@ -372,11 +373,21 @@ void Game::UFOSpawner(float deltaTime)
 {
 	UFOTimeElapsed += deltaTime;
 
-	if (UFOTimeElapsed >= UFOSpawnTime)
+	//ufo spawn time decreases when difficulty rises
+	if (UFOTimeElapsed >= UFOSpawnTime*(pow(0.9f, currentLevel)))
 	{
 		UFOTimeElapsed = 0;
 		UFO* ufo = SpawnUFO(Vector2f(1,1), &PlayerOne);
-		ufo->setPosition(0, 0);
+
+		int randX = rand() % 2;
+		int randY = rand() % 2;
+
+		LOG(randX);
+		Vector2f pos(-50, -50);
+		pos.x += randX * 1000;
+		pos.y += randY * 1000;
+
+		ufo->setPosition(pos);
 	}
 }
 

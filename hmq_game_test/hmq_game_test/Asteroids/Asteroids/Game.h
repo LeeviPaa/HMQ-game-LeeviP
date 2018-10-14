@@ -15,7 +15,7 @@ private:
 	bool prevSpacePressed;
 	bool spacePressed;
 	int currentLevel = 1;
-	float timePerLevel = 5;
+	float timePerLevel = 30;
 	float levelTimer = 0;
 
 	float changeTimer = 0;
