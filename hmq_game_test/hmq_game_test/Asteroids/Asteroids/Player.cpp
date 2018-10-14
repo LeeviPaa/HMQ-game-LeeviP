@@ -128,13 +128,6 @@ Player::Player()
 {
 	//setup the player values
 
-	setOrigin(15, 15);
-	setPosition(400, 400);
-
-	sf::Vector2<float> boxSize;
-	boxSize.x = 25;
-	boxSize.y = 25;
-
 	playerShape = VertexArray(sf::TriangleFan, 4);
 	playerShape[0].position = Vector2f(15, 20);
 	playerShape[1].position = Vector2f(0, 30);
@@ -146,7 +139,28 @@ Player::Player()
 	playerShape[2].color = sf::Color::White;
 	playerShape[3].color = sf::Color::White;
 
-	boundingBox = playerShape.getBounds();
+	collision = ConvexShape(3);
+	collision.setPoint(0, Vector2f(15, 0));
+	collision.setPoint(1, Vector2f(0, 30));
+	collision.setPoint(2, Vector2f(30, 30));
+
+	setOrigin(15, 15);
+	collision.setOrigin(15, 15);
+	setPosition(400, 400);
+	collision.setPosition(getPosition());
+}
+
+void Player::Die()
+{
+	CurrentVelocity = Vector2f(0, 0);
+	alive = false;
+}
+
+void Player::Reset()
+{
+	setPosition(400, 400);
+	CurrentVelocity = Vector2f(0, 0);
+	alive = true;
 }
 
 void Player::Update(sf::Time deltaTime)
@@ -156,6 +170,9 @@ void Player::Update(sf::Time deltaTime)
 	Movement(deltaTime.asSeconds());
 
 	Rotation(deltaTime.asSeconds());
+
+	collision.setPosition(getPosition());
+	collision.setRotation(getRotation());
 
 	Shooting(deltaTime.asSeconds());
 }

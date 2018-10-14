@@ -8,6 +8,7 @@ private:
 	float Acceleration = 10.f;
 	float Deceleration = 0.7f;
 	bool gate = false;
+	bool alive = true;
 	Vector2<float> CurrentVelocity;
 	sf::RectangleShape shape;
 	
@@ -22,10 +23,14 @@ private:
 public:
 	Player();
 	VertexArray playerShape;
-	FloatRect boundingBox;
+	void Die();
+	void Reset();
 	void Update(sf::Time deltaTime) override;
 	void draw(RenderTarget& target, RenderStates states) const
 	{
+		if (!alive)
+			return;
+
 		states.transform *= getTransform();
 
 		target.draw(playerShape, states);

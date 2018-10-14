@@ -7,6 +7,7 @@ private:
 	float MoveSpeed = 100.f;
 	Vector2f Direction;
 	float TimeElapsed = 0;
+	float RotSpeed = 0;
 	bool dead = false;
 	void Die();
 	VertexArray AsteroidShape;
@@ -21,7 +22,6 @@ public:
 	Asteroid(Vector2f direction, AsteroidType type);
 	~Asteroid();
 	AsteroidType asteroType;
-	FloatRect boundingBox;
 	void Collide();
 
 	void Update(sf::Time deltaTime) override;

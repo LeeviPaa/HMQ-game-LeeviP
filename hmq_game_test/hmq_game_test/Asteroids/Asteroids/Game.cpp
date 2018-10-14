@@ -15,13 +15,31 @@ std::list<Asteroid*> Game::ToBeDeletedAsteroids = std::list<Asteroid*>();
 std::list<PlayerBullet> Game::PBulletsInGame = std::list <PlayerBullet>();
 std::list<PlayerBullet*> Game::ToBeDeletedPBullets = std::list <PlayerBullet*>();
 
+std::list<UFO> Game::UFOsInGame = std::list <UFO>();
+std::list<UFO*> Game::ToBeDeletedUFO = std::list<UFO*>();
+
 
 void Game::Update(sf::Time deltaTime)
 {
+	prevSpacePressed = spacePressed;
+	spacePressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+
+	if (!gameGoing)
+	{
+		if (!prevSpacePressed && spacePressed)
+		{
+			RestartGame();
+		}
+	}
+	else
+	{
+		PlayerOne.Update(deltaTime);
+		UFOSpawner(deltaTime.asSeconds());
+	}
+
 	float fps = 1 / deltaTime.asSeconds();
 	//LOG(fps);
 	
-	PlayerOne.Update(deltaTime);
 
 	//loop for updating all the objects
 	std::list<Asteroid>::iterator updateIterator;
@@ -37,6 +55,14 @@ void Game::Update(sf::Time deltaTime)
 		PlayerBullet* pbullet = &*updateIteratorB;
 		pbullet->Update(deltaTime);
 	}
+
+	std::list<UFO>::iterator updateIteratorC;
+	for (updateIteratorC = UFOsInGame.begin(); updateIteratorC != UFOsInGame.end(); updateIteratorC++)
+	{
+		UFO* ufo = &*updateIteratorC;
+		ufo->Update(deltaTime);
+	}
+
 	AsteroidSpawner(deltaTime.asSeconds());
 }
 
@@ -49,10 +75,6 @@ void Game::Draw(sf::RenderWindow* window)
 
 	sf::Text text("Score: " + std::to_string(PlayerScore) , font, 50);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-	{
-		PlayerScore++;
-	}
 
 	window->clear();
 
@@ -69,6 +91,19 @@ void Game::Draw(sf::RenderWindow* window)
 		window->draw(*drawIteratorB);
 	}
 
+	std::list<UFO>::iterator drawIteratorC;
+	for (drawIteratorC = UFOsInGame.begin(); drawIteratorC != UFOsInGame.end(); drawIteratorC++)
+	{
+		window->draw(*drawIteratorC);
+	}
+
+	if (!gameGoing)
+	{
+		sf::Text deathText("You are dead! \nPress space to restart.", font, 50);
+		deathText.setPosition(150, 350);
+		window->draw(deathText);
+	}
+
 	window->draw(text);
 	window->draw(PlayerOne);
 
@@ -77,12 +112,23 @@ void Game::Draw(sf::RenderWindow* window)
 
 void Game::CheckCollisions()
 {
-	std::list<Asteroid>::iterator updateIterator;
-	for (updateIterator = AsteroidsInGame.begin(); updateIterator != AsteroidsInGame.end(); updateIterator++)
-	{
-		Asteroid* asteroid = &*updateIterator;
-		sf::FloatRect bounds = asteroid->boundingBox;
+	if (!gameGoing)
+		return;
 
+	std::list<Asteroid>::iterator asteroidIterator;
+	for (asteroidIterator = AsteroidsInGame.begin(); asteroidIterator != AsteroidsInGame.end(); asteroidIterator++)
+	{
+		Asteroid* asteroid = &*asteroidIterator;
+		sf::FloatRect bounds = asteroid->collision.getGlobalBounds();
+
+		//check player collision
+		sf::FloatRect playerBounds = PlayerOne.collision.getGlobalBounds();
+		if (bounds.intersects(playerBounds))
+		{
+			PlayerDeath();
+		}
+
+		//check collisions against bullets
 		std::list<PlayerBullet>::iterator iter;
 		for (iter = PBulletsInGame.begin(); iter != PBulletsInGame.end(); iter++)
 		{
@@ -108,9 +154,23 @@ void Game::CheckCollisions()
 				default:
 					break;
 				}
-				
 			}
 		}
+
+		//asteroid to asteroid collisions
+		//this wasn't required but it's there
+
+		/*std::list<Asteroid>::iterator iterA;
+		for(iterA = AsteroidsInGame.begin(); iterA != AsteroidsInGame.end(); iterA++)
+		{
+			Asteroid* asteroidA = &*iterA;
+			sf::FloatRect boundsA = asteroidA->collision.getGlobalBounds();
+			if (asteroidIterator != iterA && bounds.intersects(boundsA))
+			{
+				asteroid->Collide();
+				asteroidA->Collide();
+			}
+		}*/
 	}
 }
 
@@ -193,6 +253,53 @@ void Game::AsteroidSpawner(float deltaTime)
 		Asteroid* astero = SpawnAsteroid(directionV, Asteroid::AsteroidType::big);
 		astero->setPosition(position);
 	}
+}
+
+void Game::UFOSpawner(float deltaTime)
+{
+	UFOTimeElapsed += deltaTime;
+
+	if (UFOTimeElapsed >= UFOSpawnTime)
+	{
+		UFOTimeElapsed = 0;
+		UFO* ufo = SpawnUFO(Vector2f(1,1), &PlayerOne);
+		ufo->setPosition(300, 300);
+	}
+}
+
+
+void Game::PlayerDeath()
+{
+	PlayerOne.Die();
+	gameGoing = false;
+	LOG("Player died!");
+}
+
+void Game::RestartGame()
+{
+	gameGoing = true;
+
+	//clear all the objects
+	std::list<Asteroid>::iterator iter;
+	for (iter = AsteroidsInGame.begin(); iter != AsteroidsInGame.end(); iter++)
+	{
+		DeleteAsteroid(&*iter);
+	}
+
+	std::list<PlayerBullet>::iterator iterA;
+	for (iterA = PBulletsInGame.begin(); iterA != PBulletsInGame.end(); iterA++)
+	{
+		DeletePBullet(&*iterA);
+	}
+
+	std::list<UFO>::iterator iterB;
+	for (iterB = UFOsInGame.begin(); iterB != UFOsInGame.end(); iterB++)
+	{
+		DeleteUFO(&*iterB);
+	}
+
+	PlayerScore = 0;
+	PlayerOne.Reset();
 }
 
 void Game::DeleteObjects()
@@ -321,3 +428,40 @@ bool Game::PBulletIsInList(PlayerBullet* bullet)
 	}
 	return false;
 }
+
+UFO * Game::SpawnUFO(Vector2f direction, Player * playerRef)
+{
+	UFO object(playerRef, direction);
+	Game::UFOsInGame.push_front(object);
+	std::list<UFO>::iterator it = UFOsInGame.begin();
+
+	return &*it;
+}
+bool Game::DeleteUFO(UFO * deletable)
+{
+	std::list<UFO>::iterator iter;
+	for (iter = UFOsInGame.begin(); iter != UFOsInGame.end(); iter++)
+	{
+		if (deletable == &*iter)
+		{
+			Game::ToBeDeletedUFO.push_front(&*iter);
+			return true;
+		}
+	}
+	return false;
+}
+bool Game::UFOsInList(UFO * ufo)
+{
+	std::list<UFO*>::iterator iter;
+	for (iter = ToBeDeletedUFO.begin(); iter != ToBeDeletedUFO.end();)
+	{
+		if (ufo == *iter)
+		{
+			return true;
+		}
+		else
+			++iter;
+	}
+	return false;
+}
+

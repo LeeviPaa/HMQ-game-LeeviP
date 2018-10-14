@@ -13,7 +13,6 @@ void Asteroid::Die()
 	Vector2f direction(0, 0);
 	float dirX = ((rand() % 200) - 100.f)/100.f;
 	float dirY = ((rand() % 200) - 100.f)/100.f;
-	LOG(direction.x);
 	direction.x = dirX;
 	direction.y = dirY;
 
@@ -25,15 +24,16 @@ void Asteroid::Die()
 	{
 	case Asteroid::big:
 		subA = Game::SpawnAsteroid(direction, AsteroidType::medium);
-		subA->setPosition(getPosition() + direction*55.f);
+		//move the sub asteroids with a normalized vector
+		subA->setPosition(getPosition() + (direction / VectorLenght(direction))*55.f);
 		subB = Game::SpawnAsteroid(-direction, AsteroidType::medium);
-		subB->setPosition(getPosition() - direction * 55.f);
+		subB->setPosition(getPosition() - (direction / VectorLenght(direction)) * 55.f);
 		break;
 	case Asteroid::medium:
 		subA = Game::SpawnAsteroid(direction, AsteroidType::small);
-		subA->setPosition(getPosition() + direction * 30.f);
+		subA->setPosition(getPosition() + (direction / VectorLenght(direction)) * 30.f);
 		subB = Game::SpawnAsteroid(-direction, AsteroidType::small);
-		subB->setPosition(getPosition() - direction * 30.f);
+		subB->setPosition(getPosition() - (direction / VectorLenght(direction)) * 30.f);
 		break;
 	case Asteroid::small:
 		break;
@@ -48,7 +48,13 @@ Asteroid::Asteroid(Vector2f direction, AsteroidType type)
 		
 	AsteroidShape = VertexArray(sf::LineStrip, 8);
 
+	RotSpeed = (rand() % 300) - 150;
+	float startRot = rand() % 360;
+	setRotation(startRot);
+	collision.setRotation(startRot);
+
 	asteroType = type;
+
 
 	switch (type)
 	{
@@ -116,8 +122,10 @@ Asteroid::Asteroid(Vector2f direction, AsteroidType type)
 	AsteroidShape[6].color = sf::Color::White;
 	AsteroidShape[7].color = sf::Color::White;
 
+	setOrigin(50, 50);
+	collision.setOrigin(50, 50);
+
 	collision.setScale(getScale());
-	boundingBox = collision.getGlobalBounds();
 }
 
 Asteroid::~Asteroid()
@@ -127,7 +135,11 @@ Asteroid::~Asteroid()
 
 void Asteroid::Collide()
 {
-	LOG("Collision");
+	//check for death, else this keeps colliding with the new asteroids and creates an infinite loop
+	if (dead)
+		return;
+
+	//LOG("Collision");
 	Die();
 }
 
@@ -136,10 +148,10 @@ void Asteroid::Update(sf::Time deltaTime)
 	if (dead)
 		return;
 	move(Direction*deltaTime.asSeconds()*MoveSpeed);
-
-	boundingBox = collision.getGlobalBounds();
+	rotate(RotSpeed * deltaTime.asSeconds());
 
 	collision.setPosition(getPosition());
+	collision.setRotation(getRotation());
 
 	Vector2f point = collision.getPoint(0);
 
