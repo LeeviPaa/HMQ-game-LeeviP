@@ -5,7 +5,7 @@
 class UFO : public Actor
 {
 private: 
-	float speed = 100.f;
+	float speed = 0.35f;
 	int health = 2;
 	float timeElapsed = 0;
 	float timePerShot = 1.f;

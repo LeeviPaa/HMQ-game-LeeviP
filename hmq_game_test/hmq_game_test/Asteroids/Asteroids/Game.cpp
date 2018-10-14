@@ -3,6 +3,7 @@
 #include "Actor.h"
 #include <string>
 #include <random>
+#include <math.h>
 
 #define LOG(x) std::cout << x << std::endl
 
@@ -12,12 +13,14 @@ std::list<Player> Game::PlayersInGame = std::list<Player>();
 std::list<Asteroid> Game::AsteroidsInGame = std::list<Asteroid>();
 std::list<Asteroid*> Game::ToBeDeletedAsteroids = std::list<Asteroid*>();
 
-std::list<PlayerBullet> Game::PBulletsInGame = std::list <PlayerBullet>();
-std::list<PlayerBullet*> Game::ToBeDeletedPBullets = std::list <PlayerBullet*>();
+std::list<Bullet> Game::PBulletsInGame = std::list <Bullet>();
+std::list<Bullet*> Game::ToBeDeletedPBullets = std::list <Bullet*>();
 
 std::list<UFO> Game::UFOsInGame = std::list <UFO>();
 std::list<UFO*> Game::ToBeDeletedUFO = std::list<UFO*>();
 
+std::list<Bullet> Game::UFOBulletsInGame = std::list <Bullet>();
+std::list<Bullet*> Game::ToBeDeletedUFOBullets = std::list <Bullet*>();
 
 void Game::Update(sf::Time deltaTime)
 {
@@ -35,11 +38,16 @@ void Game::Update(sf::Time deltaTime)
 	{
 		PlayerOne.Update(deltaTime);
 		UFOSpawner(deltaTime.asSeconds());
+		LevelChanger(deltaTime.asSeconds());
 	}
 
 	float fps = 1 / deltaTime.asSeconds();
 	//LOG(fps);
 	
+	if (levelChanging)
+	{
+		UpdateLevelChange(deltaTime.asSeconds());
+	}
 
 	//loop for updating all the objects
 	std::list<Asteroid>::iterator updateIterator;
@@ -49,10 +57,10 @@ void Game::Update(sf::Time deltaTime)
 		asteroid->Update(deltaTime);
 	}
 
-	std::list<PlayerBullet>::iterator updateIteratorB;
+	std::list<Bullet>::iterator updateIteratorB;
 	for (updateIteratorB = PBulletsInGame.begin(); updateIteratorB != PBulletsInGame.end(); updateIteratorB++)
 	{
-		PlayerBullet* pbullet = &*updateIteratorB;
+		Bullet* pbullet = &*updateIteratorB;
 		pbullet->Update(deltaTime);
 	}
 
@@ -61,6 +69,13 @@ void Game::Update(sf::Time deltaTime)
 	{
 		UFO* ufo = &*updateIteratorC;
 		ufo->Update(deltaTime);
+	}
+
+	std::list<Bullet>::iterator updateIteratorD;
+	for (updateIteratorD = UFOBulletsInGame.begin(); updateIteratorD != UFOBulletsInGame.end(); updateIteratorD++)
+	{
+		Bullet* bullet = &*updateIteratorD;
+		bullet->Update(deltaTime);
 	}
 
 	AsteroidSpawner(deltaTime.asSeconds());
@@ -74,7 +89,8 @@ void Game::Draw(sf::RenderWindow* window)
 	shape.setFillColor(sf::Color::Green);
 
 	sf::Text text("Score: " + std::to_string(PlayerScore) , font, 50);
-
+	sf::Text levelText("Level: " + std::to_string(currentLevel) , font, 50);
+	levelText.setPosition(0, 50);
 
 	window->clear();
 
@@ -85,10 +101,16 @@ void Game::Draw(sf::RenderWindow* window)
 		window->draw(*drawIterator);
 	}
 
-	std::list<PlayerBullet>::iterator drawIteratorB;
+	std::list<Bullet>::iterator drawIteratorB;
 	for (drawIteratorB = PBulletsInGame.begin(); drawIteratorB != PBulletsInGame.end(); drawIteratorB++)
 	{
 		window->draw(*drawIteratorB);
+	}
+
+	std::list<Bullet>::iterator drawIteratorD;
+	for (drawIteratorD = UFOBulletsInGame.begin(); drawIteratorD != UFOBulletsInGame.end(); drawIteratorD++)
+	{
+		window->draw(*drawIteratorD);
 	}
 
 	std::list<UFO>::iterator drawIteratorC;
@@ -105,7 +127,11 @@ void Game::Draw(sf::RenderWindow* window)
 	}
 
 	window->draw(text);
+	window->draw(levelText);
 	window->draw(PlayerOne);
+
+	if(levelChanging)
+		window->draw(levelChangeText);
 
 	window->display();
 }
@@ -115,6 +141,7 @@ void Game::CheckCollisions()
 	if (!gameGoing)
 		return;
 
+	//asteroid collisions
 	std::list<Asteroid>::iterator asteroidIterator;
 	for (asteroidIterator = AsteroidsInGame.begin(); asteroidIterator != AsteroidsInGame.end(); asteroidIterator++)
 	{
@@ -129,11 +156,11 @@ void Game::CheckCollisions()
 		}
 
 		//check collisions against bullets
-		std::list<PlayerBullet>::iterator iter;
+		std::list<Bullet>::iterator iter;
 		for (iter = PBulletsInGame.begin(); iter != PBulletsInGame.end(); iter++)
 		{
 			//If the bullet collides with an asteroid: do something
-			PlayerBullet* bullet = &*iter;
+			Bullet* bullet = &*iter;
 			if (bounds.contains(bullet->getPosition()))
 			{
 				asteroid->Collide();
@@ -172,6 +199,92 @@ void Game::CheckCollisions()
 			}
 		}*/
 	}
+
+	std::list<Bullet>::iterator bulletIter;
+	for (bulletIter = UFOBulletsInGame.begin(); bulletIter != UFOBulletsInGame.end(); bulletIter++)
+	{
+		Bullet* bullet = &*bulletIter;
+		if (PlayerOne.collision.getGlobalBounds().contains(bullet->getPosition()))
+		{
+			PlayerDeath();
+		}
+	}
+
+	//bullets that kill ufos
+	std::list<Bullet>::iterator bulletIterA;
+	for (bulletIterA = PBulletsInGame.begin(); bulletIterA != PBulletsInGame.end(); bulletIterA++)
+	{
+		Bullet* bullet = &*bulletIterA;
+		
+		std::list<UFO>::iterator iter;
+		for (iter = UFOsInGame.begin(); iter != UFOsInGame.end(); iter++)
+		{
+			UFO* ufo = &*iter;
+			if (ufo->collision.getGlobalBounds().contains(bullet->getPosition()))
+			{
+				ufo->Collide();
+			}
+		}
+	}
+
+	//ufos that kill player
+	std::list<UFO>::iterator ufoIter;
+	for (ufoIter = UFOsInGame.begin(); ufoIter != UFOsInGame.end(); ufoIter++)
+	{
+		UFO* ufo = &*ufoIter;
+		
+		if (PlayerOne.collision.getGlobalBounds().intersects(ufo->collision.getGlobalBounds()))
+		{
+			PlayerDeath();
+		}
+	}
+}
+
+void Game::LevelChanger(float deltaTime)
+{
+	levelTimer += deltaTime;
+	if (levelTimer > timePerLevel)
+	{
+		levelTimer = 0;
+		currentLevel++;
+		ClearAllObjects();
+		ChangeLevel();
+	}
+}
+
+void Game::ChangeLevel()
+{
+	levelChanging = true;
+	levelChangeText = sf::Text("Level: " + std::to_string(currentLevel), font, 50);
+	levelChangeText.setPosition(-1000, 350);
+}
+
+void Game::UpdateLevelChange(float deltaTime)
+{
+	changeTimer += deltaTime;
+
+	Vector2f currPosition = levelChangeText.getPosition();
+
+	if (changeTimer < 1.4f)
+	{
+		levelChangeText.setPosition( Lerp(currPosition, Vector2f(300, 350), levelChangeTextSpeed*deltaTime));
+	}
+	if (changeTimer > 1.6f && changeTimer < 3.f)
+	{
+		levelChangeText.setPosition(Lerp(currPosition, Vector2f(1000, 350), levelChangeTextSpeed*deltaTime));
+	}
+	if (changeTimer > 3.f)
+	{
+		EndLevelChange();
+		changeTimer = 0;
+	}
+
+
+}
+
+void Game::EndLevelChange()
+{
+	levelChanging = false;
 }
 
 void Game::AsteroidSpawner(float deltaTime)
@@ -263,10 +376,9 @@ void Game::UFOSpawner(float deltaTime)
 	{
 		UFOTimeElapsed = 0;
 		UFO* ufo = SpawnUFO(Vector2f(1,1), &PlayerOne);
-		ufo->setPosition(300, 300);
+		ufo->setPosition(0, 0);
 	}
 }
-
 
 void Game::PlayerDeath()
 {
@@ -279,14 +391,24 @@ void Game::RestartGame()
 {
 	gameGoing = true;
 
-	//clear all the objects
+	currentLevel = 1;
+	ClearAllObjects();
+	changeTimer = 0;
+	EndLevelChange();
+
+	PlayerScore = 0;
+	PlayerOne.Reset();
+}
+
+void Game::ClearAllObjects()
+{
 	std::list<Asteroid>::iterator iter;
 	for (iter = AsteroidsInGame.begin(); iter != AsteroidsInGame.end(); iter++)
 	{
 		DeleteAsteroid(&*iter);
 	}
 
-	std::list<PlayerBullet>::iterator iterA;
+	std::list<Bullet>::iterator iterA;
 	for (iterA = PBulletsInGame.begin(); iterA != PBulletsInGame.end(); iterA++)
 	{
 		DeletePBullet(&*iterA);
@@ -298,8 +420,11 @@ void Game::RestartGame()
 		DeleteUFO(&*iterB);
 	}
 
-	PlayerScore = 0;
-	PlayerOne.Reset();
+	std::list<Bullet>::iterator iterC;
+	for (iterC = UFOBulletsInGame.begin(); iterC != UFOBulletsInGame.end(); iterC++)
+	{
+		DeleteUFOBullet(&*iterC);
+	}
 }
 
 void Game::DeleteObjects()
@@ -330,7 +455,7 @@ void Game::DeleteObjects()
 
 	if (!ToBeDeletedPBullets.empty())
 	{
-		std::list<PlayerBullet>::iterator iter;
+		std::list<Bullet>::iterator iter;
 		for (iter = PBulletsInGame.begin(); iter != PBulletsInGame.end();)
 		{
 			if (PBulletIsInList(&*iter))
@@ -343,8 +468,35 @@ void Game::DeleteObjects()
 
 		ToBeDeletedPBullets.clear();
 	}
-}
 
+	if (!ToBeDeletedUFOBullets.empty())
+	{
+		std::list<Bullet>::iterator iter;
+		for (iter = UFOBulletsInGame.begin(); iter != UFOBulletsInGame.end();)
+		{
+			if (UFOBulletIsInList(&*iter))
+			{
+				iter = UFOBulletsInGame.erase(iter);
+			}
+			else
+				iter++;
+		}
+	}
+
+	if (!ToBeDeletedUFO.empty())
+	{
+		std::list<UFO>::iterator iter;
+		for (iter = UFOsInGame.begin(); iter != UFOsInGame.end();)
+		{
+			if (UFOsInList(&*iter))
+			{
+				iter = UFOsInGame.erase(iter);
+			}
+			else
+				iter++;
+		}
+	}
+}
 
 //These are the main spawn functions (static)
 //these ensure that the spawned objects are drawn and updated
@@ -393,17 +545,17 @@ bool Game::AsteroidIsInList(Asteroid* astero)
 	return false;
 }
 
-PlayerBullet* Game::SpawnPBullet(Vector2f direction)
+Bullet* Game::SpawnPBullet(Vector2f direction)
 {
-	PlayerBullet Object(direction);
+	Bullet Object(direction);
 	Game::PBulletsInGame.push_front(Object);
-	std::list<PlayerBullet>::iterator it = PBulletsInGame.begin();
+	std::list<Bullet>::iterator it = PBulletsInGame.begin();
 
 	return &*it;
 }
-bool Game::DeletePBullet(PlayerBullet* deletable)
+bool Game::DeletePBullet(Bullet* deletable)
 {
-	std::list<PlayerBullet>::iterator iter;
+	std::list<Bullet>::iterator iter;
 	for (iter = PBulletsInGame.begin(); iter != PBulletsInGame.end(); iter++)
 	{
 		if (deletable == &* iter)
@@ -414,9 +566,9 @@ bool Game::DeletePBullet(PlayerBullet* deletable)
 	}
 	return false;
 }
-bool Game::PBulletIsInList(PlayerBullet* bullet)
+bool Game::PBulletIsInList(Bullet* bullet)
 {
-	std::list<PlayerBullet*>::iterator iter;
+	std::list<Bullet*>::iterator iter;
 	for (iter = ToBeDeletedPBullets.begin(); iter != ToBeDeletedPBullets.end();)
 	{
 		if (bullet == *iter)
@@ -465,3 +617,48 @@ bool Game::UFOsInList(UFO * ufo)
 	return false;
 }
 
+Bullet* Game::SpawnUFOBullet(Vector2f direction)
+{
+	Bullet Object(direction);
+	Game::UFOBulletsInGame.push_front(Object);
+	std::list<Bullet>::iterator it = UFOBulletsInGame.begin();
+
+	return &*it;
+}
+bool Game::DeleteUFOBullet(Bullet* deletable)
+{
+	std::list<Bullet>::iterator iter;
+	for (iter = UFOBulletsInGame.begin(); iter != UFOBulletsInGame.end(); iter++)
+	{
+		if (deletable == &* iter)
+		{
+			Game::ToBeDeletedUFOBullets.push_front(&*iter);
+			return true;
+		}
+	}
+	return false;
+}
+bool Game::UFOBulletIsInList(Bullet* bullet)
+{
+	std::list<Bullet*>::iterator iter;
+	for (iter = ToBeDeletedUFOBullets.begin(); iter != ToBeDeletedUFOBullets.end();)
+	{
+		if (bullet == *iter)
+		{
+			return true;
+		}
+		else
+			++iter;
+	}
+	return false;
+}
+
+float Game::Lerp(float start, float end, float alpha)
+{
+	return (start + alpha * (end - start));
+}
+
+Vector2f Game::Lerp(Vector2f start, Vector2f end, float alpha)
+{
+	return (start + alpha * (end - start));
+}

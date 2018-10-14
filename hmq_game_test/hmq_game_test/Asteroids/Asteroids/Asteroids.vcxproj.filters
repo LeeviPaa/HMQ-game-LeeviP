@@ -30,10 +30,10 @@
     <ClCompile Include="Asteroid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerBullet.cpp">
+    <ClCompile Include="UFO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UFO.cpp">
+    <ClCompile Include="Bullet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,10 +50,10 @@
     <ClInclude Include="Asteroid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerBullet.h">
+    <ClInclude Include="UFO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UFO.h">
+    <ClInclude Include="Bullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

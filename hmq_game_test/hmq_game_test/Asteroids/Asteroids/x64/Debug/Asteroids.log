@@ -1,13 +1,13 @@
 ﻿  Asteroid.cpp
 g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\asteroid.cpp(51): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\asteroid.cpp(52): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  Bullet.cpp
   Game.cpp
-g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\game.cpp(186): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\game.cpp(299): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   Main.cpp
   Player.cpp
 g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\player.cpp(82): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 g:\projects\cpp\hmq game leevip\hmq_game_test\hmq_game_test\asteroids\asteroids\player.cpp(112): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-  PlayerBullet.cpp
   UFO.cpp
   Generating Code...
   Asteroids.vcxproj -> G:\Projects\CPP\HMQ game LeeviP\hmq_game_test\hmq_game_test\Asteroids\x64\Debug\Asteroids.exe

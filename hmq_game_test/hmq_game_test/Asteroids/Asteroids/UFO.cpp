@@ -7,12 +7,16 @@
 
 void UFO::Shoot(Vector2f direction)
 {
-	PlayerBullet* bullet = Game::SpawnPBullet(direction);
+	Bullet* bullet = Game::SpawnUFOBullet(direction);
 	bullet->setPosition(getPosition());
 }
 
 void UFO::Collide()
 {
+	health--;
+
+	if (health <= 0)
+		Game::DeleteUFO(this);
 }
 
 void UFO::Update(sf::Time deltaTime)
@@ -33,7 +37,7 @@ void UFO::Update(sf::Time deltaTime)
 	}
 	else
 	{
-		move(UTPNormalized*speed*deltaTime.asSeconds());
+		move(ufoToPlayer*speed*deltaTime.asSeconds());
 	}
 
 	collision.setPosition(getPosition());

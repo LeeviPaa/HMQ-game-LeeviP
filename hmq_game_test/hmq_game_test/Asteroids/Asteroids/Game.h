@@ -3,7 +3,7 @@
 #include <list>
 #include "Player.h"
 #include "Asteroid.h"
-#include "PlayerBullet.h"
+#include "Bullet.h"
 #include "UFO.h"
 
 class Game
@@ -14,7 +14,14 @@ private:
 	bool gameGoing = true;
 	bool prevSpacePressed;
 	bool spacePressed;
-	int currentDifficulty = 0;
+	int currentLevel = 1;
+	float timePerLevel = 5;
+	float levelTimer = 0;
+
+	float changeTimer = 0;
+	bool levelChanging = false;
+	float levelChangeTextSpeed = 20;
+	sf::Text levelChangeText;
 
 	float AsteroidSpawnTime = 1.f;
 	float AsteroidTimeElapsed = 0;
@@ -28,17 +35,27 @@ private:
 
 	static std::list<Player> PlayersInGame;
 
-	static std::list<PlayerBullet> PBulletsInGame;
-	static std::list<PlayerBullet*> ToBeDeletedPBullets;
+	static std::list<Bullet> PBulletsInGame;
+	static std::list<Bullet*> ToBeDeletedPBullets;
 
 	static std::list<UFO> UFOsInGame;
 	static std::list<UFO*> ToBeDeletedUFO;
 
+	static std::list<Bullet> UFOBulletsInGame;
+	static std::list<Bullet*> ToBeDeletedUFOBullets;
+
 	void AsteroidSpawner(float deltaTime);
 	void UFOSpawner(float deltaTime);
+	void LevelChanger(float deltaTime);
 	void PlayerDeath();
 	void RestartGame();
+	void ClearAllObjects();
+	void ChangeLevel();
+	void UpdateLevelChange(float deltaTime);
+	void EndLevelChange();
 
+	float Lerp(float start, float end, float alpha);
+	Vector2f Lerp(Vector2f start, Vector2f end, float alpha);
 
 public:
 
@@ -51,13 +68,17 @@ public:
 	static bool DeleteAsteroid(Asteroid* deletable);
 	bool AsteroidIsInList(Asteroid* astero);
 
-	static PlayerBullet* SpawnPBullet(Vector2f direction);
-	static bool DeletePBullet(PlayerBullet* deletable);
-	bool PBulletIsInList(PlayerBullet* bullet);
+	static Bullet* SpawnPBullet(Vector2f direction);
+	static bool DeletePBullet(Bullet* deletable);
+	bool PBulletIsInList(Bullet* bullet);
 
 	static UFO* SpawnUFO(Vector2f direction, Player* playerRef);
 	static bool DeleteUFO(UFO* deletable);
 	bool UFOsInList(UFO* ufo);
+
+	static Bullet* SpawnUFOBullet(Vector2f direction);
+	static bool DeleteUFOBullet(Bullet* deletable);
+	bool UFOBulletIsInList(Bullet* bullet);
 
 	sf::Font font;
 	static sf::Vector2<int> LocalMousePosition;

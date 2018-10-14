@@ -114,7 +114,7 @@ void Player::Shooting(float deltaTime)
 		relativeMousePositionF /= VectorLenght(relativeMousePositionF);
 
 		Vector2f direction = relativeMousePositionF;
-		PlayerBullet* pbullet = Game::SpawnPBullet(direction);
+		Bullet* pbullet = Game::SpawnPBullet(direction);
 		pbullet->setPosition(getPosition());
 	}
 }
